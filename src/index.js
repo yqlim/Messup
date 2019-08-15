@@ -5,15 +5,17 @@ import * as utils from './utils';
 const Messup = {
 
   fromRange(min = 0, max = 1, hideWarning){
-    if (hideWarning !== true){
-      utils.warnIfTooBig(min, max);
-    }
+    utils.throwIfNotInteger(min, max);
 
     if (max < min){
       throw new TypeError('The `max` argument cannot be smaller than the `min` argument.');
     }
 
-    let diff = Math.abs(max - min);
+    if (hideWarning !== true){
+      utils.warnIfTooBig(min, max);
+    }
+
+    let diff = max - min;
 
     // To make upper limit inclusion possible
     // because `Math.floor` is used.

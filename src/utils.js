@@ -6,10 +6,17 @@ export function throwIfInvalidLength(type, length){
     throw new RangeError(`Cannot generate less than 1 ${type}.`);
 }
 
+export function throwIfNotInteger(){
+  forEach(arguments, function(n){
+    if (n % 1 !== 0)
+      throw new TypeError(`Number ${n} is not an integer.`);
+  });
+}
+
 export function warnIfTooBig(){
-  Array.prototype.forEach.call(arguments, function(int){
+  forEach(arguments, function(int){
     if (int.toString().replace(/[^0-9]/g).length > 15){
-      console.warn(`Number ${int} is too large/small for a precise computation because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
+      console.warn(`Number ${int} is cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
     }
   });
 }
@@ -24,4 +31,9 @@ export function randomFrom(list, resultLength){
   }
 
   return ret;
+}
+
+
+function forEach(iterable, callback, context){
+  Array.prototype.forEach.call(iterable, callback, context);
 }
