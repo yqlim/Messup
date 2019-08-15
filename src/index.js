@@ -4,20 +4,34 @@ import * as utils from './utils';
 
 const Messup = {
 
-  fromRange(from = 0, to = constants.MAX_SAFE_INTEGER){
-    const diff = Math.abs(to - from);
-    return Math.floor(Math.random() * (diff + 1) + from);
+  fromRange(min = 0, max = 1, hideWarning){
+    if (hideWarning !== true){
+      utils.warnIfTooBig(min, max);
+    }
+
+    if (max < min){
+      throw new TypeError('The `max` argument cannot be smaller than the `min` argument.');
+    }
+
+    let diff = Math.abs(max - min);
+
+    // To make upper limit inclusion possible
+    // because `Math.floor` is used.
+    diff += 1;
+
+    return Math.floor(Math.random() * diff + min);
   },
 
-  number(length, parseAsNumber){
-    const ret = utils.randomFrom(constants.NUM, length);
-    return parseAsNumber === true
-      ? parseInt(ret)
-      : ret;
+  number(length){
+    utils.throwIfInvalidLength('character', length);
+
+    const result = utils.randomFrom(constants.NUM, length);
+
+    return parseInt(result);
   },
 
   string(length){
-    utils.throwIfInvalidLength(length);
+    utils.throwIfInvalidLength('character', length);
 
     let ret = '';
 
@@ -28,19 +42,43 @@ const Messup = {
     return ret;
   },
 
-  hex(length, useUpperCase){
-    const map = constants.NUM.concat(useUpperCase === true ? constants.UPC : constants.LWC);
-    return utils.randomFrom(map, length);
+  hex(byte, useUpperCase){
+    utils.throwIfInvalidLength('byte', byte);
+
+    const str = Messup.string(byte);
+
+    let result = '';
+
+    try {
+      result = Buffer.from(str).toString('hex');
+    } catch(e){
+      for (let i = 0; i < byte; i++){
+        result += str.charCodeAt(i).toString(16);
+      }
+    }
+
+    return useUpperCase === true
+      ? result.toUpperCase()
+      : result;
   },
 
   base62(length){
+    utils.throwIfInvalidLength('character', length);
+
     const map = constants.NUM.concat(constants.UPC, constants.LWC);
+
     return utils.randomFrom(map, length);
   },
 
-  base64(length){
-    const map = constants.NUM.concat(constants.UPC, constants.LWC, constants.SYM);
-    return utils.randomFrom(map, length);
+  base64(byte){
+    utils.throwIfInvalidLength('byte', byte);
+
+    const str = Messup.string(byte);
+    try {
+      return Buffer.from(str).toString('base64');
+    } catch (e) {
+      return window.btoa(str);
+    }
   }
 
 };
@@ -51,7 +89,7 @@ try {
   const { randomBytes } = require('crypto');
 
   Messup.bytes = function bytes(bytes, encoding){
-    utils.throwIfInvalidBytes(bytes);
+    utils.throwIfInvalidLength('byte', bytes);
     const ret = randomBytes(bytes);
     return typeof encoding === 'string'
       ? ret.toString(encoding)
@@ -66,7 +104,7 @@ try {
   else {
 
     Messup.bytes = function bytes(bytes, encoding){
-      utils.throwIfInvalidBytes(bytes);
+      utils.throwIfInvalidLength('byte', bytes);
 
       // Use Uint8Array to simulate NodeJS's Buffer
       let array = new Uint8Array(bytes);
