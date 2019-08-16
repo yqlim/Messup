@@ -7,14 +7,14 @@ export function throwIfInvalidLength(type, length){
 }
 
 export function throwIfNotInteger(){
-  forEach(arguments, function(n){
+  forEach(arguments, function isInteger(n){
     if (n % 1 !== 0)
       throw new TypeError(`Number ${n} is not an integer.`);
   });
 }
 
 export function warnIfTooBig(){
-  forEach(arguments, function(int){
+  forEach(arguments, function isTooBig(int){
     if (int.toString().replace(/[^0-9]/g).length > 15){
       console.warn(`Number ${int} is cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
     }
@@ -33,7 +33,22 @@ export function randomFrom(list, resultLength){
   return ret;
 }
 
-
-function forEach(iterable, callback, context){
+export function forEach(iterable, callback, context){
   Array.prototype.forEach.call(iterable, callback, context);
+}
+
+export function leftPad(str, expectedLength, pad){
+  const len = str.length;
+
+  if (len >= expectedLength)
+    return str;
+
+  for (let i = 0; i < len; i++)
+    str = pad + str;
+
+  return str;
+}
+
+export function inclusiveRangeRandom(min, max){
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }

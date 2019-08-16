@@ -15,13 +15,7 @@ const Messup = {
       utils.warnIfTooBig(min, max);
     }
 
-    let diff = max - min;
-
-    // To make upper limit inclusion possible
-    // because `Math.floor` is used.
-    diff += 1;
-
-    return Math.floor(Math.random() * diff + min);
+    return utils.inclusiveRangeRandom(min, max);
   },
 
   number(length){
@@ -44,19 +38,13 @@ const Messup = {
     return ret;
   },
 
-  hex(byte, useUpperCase){
-    utils.throwIfInvalidLength('byte', byte);
-
-    const str = Messup.string(byte);
+  hex(bytes, useUpperCase){
+    utils.throwIfInvalidLength('byte', bytes);
 
     let result = '';
 
-    try {
-      result = Buffer.from(str).toString('hex');
-    } catch(e){
-      for (let i = 0; i < byte; i++){
-        result += str.charCodeAt(i).toString(16);
-      }
+    for (let i = 0; i < bytes; i++){
+      result += utils.leftPad(utils.inclusiveRangeRandom(0, 255).toString(16), 2, 0);
     }
 
     return useUpperCase === true
@@ -72,14 +60,19 @@ const Messup = {
     return utils.randomFrom(map, length);
   },
 
-  base64(byte){
-    utils.throwIfInvalidLength('byte', byte);
+  base64(bytes){
+    utils.throwIfInvalidLength('byte', bytes);
 
-    const str = Messup.string(byte);
+    let result = '';
+
+    for (let i = 0; i < bytes; i++){
+      result += String.fromCharCode(utils.inclusiveRangeRandom(0, 255));
+    }
+
     try {
-      return Buffer.from(str).toString('base64');
+      return global.Buffer.from(result).toString('base64');
     } catch (e) {
-      return window.btoa(str);
+      return window.btoa(result);
     }
   }
 
@@ -128,17 +121,21 @@ try {
       }
 
       function toHex(typedArray){
-        return typedArray
-          .toLocaleString()   // IE does not support array methods in TypedArrays
-          .split(/[^0-9]/g)
-          .map(toRadix16)
-          .join('');
+        const len = typedArray.length;
+
+        let ret = '';
+
+        for (let i = 0; i < len; i++){
+          ret += toRadix16(typedArray[i]);
+        }
+
+        return ret;
       }
 
       function toRadix16(string){
         const hex = Number(string).toString(16);
 
-        // Conditionally leading zero
+        // Conditionally add leading zero
         // because leading zero is truncated by `Number(string)`
         return (hex.length === 1 ? '0' : '') + hex;
       }
