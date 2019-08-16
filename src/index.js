@@ -4,7 +4,7 @@ import * as utils from './utils';
 
 const Messup = {
 
-  fromRange(min = 0, max = 1, hideWarning){
+  number(min, max, hideWarning){
     utils.throwIfNotInteger(min, max);
 
     if (max < min){
@@ -18,12 +18,24 @@ const Messup = {
     return utils.inclusiveRangeRandom(min, max);
   },
 
-  number(length){
+  numberByLength(length, hideWarning){
     utils.throwIfInvalidLength('character', length);
 
-    const result = utils.randomFrom(constants.NUM, length);
+    if (hideWarning !== true && length > 15){
+      console.warn(`Numbers with more than 15 digits cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
+    }
 
-    return parseInt(result);
+    let result;
+
+    while (true){
+      result = utils.randomFrom(constants.NUM, length);
+      if (result[0] !== '0'){
+        result = parseInt(result);
+        break;
+      }
+    }
+
+    return result;
   },
 
   string(length){
@@ -32,7 +44,7 @@ const Messup = {
     let ret = '';
 
     while (length--){
-      ret += String.fromCharCode(Messup.fromRange(constants.CHARCODE_OF_KEYBOARD_CHARS_LOWEST, constants.CHARCODE_OF_KEYBOARD_CHARS_HIGHEST));
+      ret += String.fromCharCode(Messup.number(constants.CHARCODE_OF_KEYBOARD_CHARS_LOWEST, constants.CHARCODE_OF_KEYBOARD_CHARS_HIGHEST));
     }
 
     return ret;

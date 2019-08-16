@@ -16,7 +16,7 @@ export function throwIfNotInteger(){
 export function warnIfTooBig(){
   forEach(arguments, function isTooBig(int){
     if (int.toString().replace(/[^0-9]/g).length > 15){
-      console.warn(`Number ${int} is cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
+      console.warn(`Number ${int} cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
     }
   });
 }
