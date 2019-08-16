@@ -4,7 +4,7 @@ import * as utils from './utils';
 
 const Messup = {
 
-  number(min, max, hideWarning){
+  number(min = 0, max = 1, hideWarning){
     utils.throwIfNotInteger(min, max);
 
     if (max < min){
@@ -27,24 +27,27 @@ const Messup = {
 
     let result;
 
-    while (true){
+    do {
       result = utils.randomFrom(constants.NUM, length);
-      if (result[0] !== '0'){
-        result = parseInt(result);
-        break;
-      }
-    }
+    } while (result[0] !== '0');
 
     return result;
   },
 
-  string(length){
+  string(length, customCharSet){
     utils.throwIfInvalidLength('character', length);
+
+    if (typeof customCharSet === 'string' && customCharSet.length > 0)
+      return utils.randomFrom(customCharSet, length);
 
     let ret = '';
 
     while (length--){
-      ret += String.fromCharCode(Messup.number(constants.CHARCODE_OF_KEYBOARD_CHARS_LOWEST, constants.CHARCODE_OF_KEYBOARD_CHARS_HIGHEST));
+      const randomCharCode = Messup.number(
+        constants.CHARCODE_OF_KEYBOARD_CHARS_LOWEST,
+        constants.CHARCODE_OF_KEYBOARD_CHARS_HIGHEST
+      );
+      ret += String.fromCharCode(randomCharCode);
     }
 
     return ret;
@@ -56,7 +59,8 @@ const Messup = {
     let result = '';
 
     for (let i = 0; i < bytes; i++){
-      result += utils.leftPad(utils.inclusiveRangeRandom(0, 255).toString(16), 2, 0);
+      const randomBytes = utils.insecureRandomByte();
+      result += utils.toHex(randomBytes);
     }
 
     return useUpperCase === true
@@ -78,7 +82,7 @@ const Messup = {
     let result = '';
 
     for (let i = 0; i < bytes; i++){
-      result += String.fromCharCode(utils.inclusiveRangeRandom(0, 255));
+      result += String.fromCharCode(utils.insecureRandomByte());
     }
 
     try {
@@ -114,42 +118,22 @@ try {
       utils.throwIfInvalidLength('byte', bytes);
 
       // Use Uint8Array to simulate NodeJS's Buffer
-      let array = new Uint8Array(bytes);
+      const buffer = new Uint8Array(bytes);
 
-      window.crypto.getRandomValues(array);
+      window.crypto.getRandomValues(buffer);
 
       switch(encoding){
         case 16:
         case 'hex':
-          return toHex(array);
+          return utils.toHex(buffer);
         case 64:
         case 'base64':
-          return window.btoa(String.fromCharCode.apply(String, array));
+          return window.btoa(String.fromCharCode.apply(String, buffer));
         default:
           if (!encoding)
-            return array;
+            return buffer;
           else
             throw new TypeError('MesseyString.bytes in browser only accept "hex" and "base64" encoding.');
-      }
-
-      function toHex(typedArray){
-        const len = typedArray.length;
-
-        let ret = '';
-
-        for (let i = 0; i < len; i++){
-          ret += toRadix16(typedArray[i]);
-        }
-
-        return ret;
-      }
-
-      function toRadix16(string){
-        const hex = Number(string).toString(16);
-
-        // Conditionally add leading zero
-        // because leading zero is truncated by `Number(string)`
-        return (hex.length === 1 ? '0' : '') + hex;
       }
     }
 

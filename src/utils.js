@@ -15,7 +15,7 @@ export function throwIfNotInteger(){
 
 export function warnIfTooBig(){
   forEach(arguments, function isTooBig(int){
-    if (int.toString().replace(/[^0-9]/g).length > 15){
+    if (int.toString().length > 15){
       console.warn(`Number ${int} cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
     }
   });
@@ -27,28 +27,47 @@ export function randomFrom(list, resultLength){
   let ret = '';
 
   while (resultLength--){
-    ret += list[Math.floor(Math.random() * listLength)];
+    ret += list[~~(Math.random() * listLength)];
   }
 
   return ret;
 }
 
-export function forEach(iterable, callback, context){
+export function inclusiveRangeRandom(min, max){
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+export function insecureRandomByte(){
+  return inclusiveRangeRandom(0, 255);
+}
+
+export function toHex(buffer){
+  if (typeof buffer === 'number'){
+    return toRadix16(byte);
+  }
+
+  let ret = '';
+
+  const len = buffer.length;
+  for (let i = 0; i < len; i++){
+    ret += toRadix16(byte[i]);
+  }
+
+  return ret;
+}
+
+function forEach(iterable, callback, context){
   Array.prototype.forEach.call(iterable, callback, context);
 }
 
-export function leftPad(str, expectedLength, pad){
-  const len = str.length;
-
-  if (len >= expectedLength)
-    return str;
-
-  for (let i = 0; i < len; i++)
+function leftPad(str, expectedLength, pad = '0'){
+  while (str.length < expectedLength){
     str = pad + str;
-
+  }
   return str;
 }
 
-export function inclusiveRangeRandom(min, max){
-  return Math.floor(Math.random() * (max - min + 1) + min);
+function toRadix16(n){
+  const hex = n.toString(16);
+  return leftPad(hex, 2);
 }
