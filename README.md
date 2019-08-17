@@ -24,7 +24,7 @@ Messup is a JavaScript tool that can be used in both Node and browsers to genera
 | `.base62`         |            `string`            |   No   |
 | `.base64`         |            `string`            |   No   |
 | `.hex`            |            `string`            |   No   |
-| `.bytes`          | `string | Buffer | Uint8Array` |  Yes   |
+| `.bytes`          | `string \| Buffer \| Uint8Array` |  Yes   |
 
 ### Support <!-- omit in TOC -->
 
