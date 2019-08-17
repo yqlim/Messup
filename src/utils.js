@@ -1,3 +1,10 @@
+export function createMethods(target, obj){
+  for (const prop in obj){
+    Object.defineProperty(target, prop, { value: obj[prop] })
+  }
+  return target;
+}
+
 export function throwIfInvalidLength(type, length){
   if (typeof length !== 'number')
     throw new TypeError('Length must be specified with a positive integer.');
@@ -8,7 +15,7 @@ export function throwIfInvalidLength(type, length){
 
 export function throwIfNotInteger(){
   forEach(arguments, function isInteger(n){
-    if (n % 1 !== 0)
+    if (typeof n !== 'number' || n % 1 !== 0)
       throw new TypeError(`Number ${n} is not an integer.`);
   });
 }
@@ -43,14 +50,14 @@ export function insecureRandomByte(){
 
 export function toHex(buffer){
   if (typeof buffer === 'number'){
-    return toRadix16(byte);
+    return toRadix16(buffer);
   }
 
   let ret = '';
 
   const len = buffer.length;
   for (let i = 0; i < len; i++){
-    ret += toRadix16(byte[i]);
+    ret += toRadix16(buffer[i]);
   }
 
   return ret;

@@ -2,7 +2,7 @@ import * as constants from './constants';
 import * as utils from './utils';
 
 
-const Messup = {
+const Messup = utils.createMethods({}, {
 
   number(min = 0, max = 1, hideWarning){
     utils.throwIfNotInteger(min, max);
@@ -29,28 +29,18 @@ const Messup = {
 
     do {
       result = utils.randomFrom(constants.NUM, length);
-    } while (result[0] !== '0');
+    } while (result[0] === '0');
 
-    return result;
+    return parseInt(result, 10);
   },
 
   string(length, customCharSet){
     utils.throwIfInvalidLength('character', length);
 
-    if (typeof customCharSet === 'string' && customCharSet.length > 0)
-      return utils.randomFrom(customCharSet, length);
+    if (typeof customCharSet !== 'string' || customCharSet.length <= 0)
+      customCharSet = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
-    let ret = '';
-
-    while (length--){
-      const randomCharCode = Messup.number(
-        constants.CHARCODE_OF_KEYBOARD_CHARS_LOWEST,
-        constants.CHARCODE_OF_KEYBOARD_CHARS_HIGHEST
-      );
-      ret += String.fromCharCode(randomCharCode);
-    }
-
-    return ret;
+    return utils.randomFrom(customCharSet, length)
   },
 
   hex(bytes, useUpperCase){
@@ -69,11 +59,10 @@ const Messup = {
   },
 
   base62(length){
-    utils.throwIfInvalidLength('character', length);
-
-    const map = constants.NUM.concat(constants.UPC, constants.LWC);
-
-    return utils.randomFrom(map, length);
+    return Messup.string(
+      length,
+      constants.NUM.concat(constants.UPC, constants.LWC)
+    );
   },
 
   base64(bytes){
@@ -92,20 +81,24 @@ const Messup = {
     }
   }
 
-};
-
+});
 
 try {
 
   const { randomBytes } = require('crypto');
 
-  Messup.bytes = function bytes(bytes, encoding){
-    utils.throwIfInvalidLength('byte', bytes);
-    const ret = randomBytes(bytes);
-    return typeof encoding === 'string'
-      ? ret.toString(encoding)
-      : ret;
-  }
+  if (typeof randomBytes !== 'function')
+    throw '';
+
+  utils.createMethods(Messup, {
+    bytes(bytes, encoding){
+      utils.throwIfInvalidLength('byte', bytes);
+      const ret = randomBytes(bytes);
+      return typeof encoding === 'string'
+        ? ret.toString(encoding)
+        : ret;
+    }
+  });
 
 } catch(e){
 
@@ -114,32 +107,32 @@ try {
 
   else {
 
-    Messup.bytes = function bytes(bytes, encoding){
-      utils.throwIfInvalidLength('byte', bytes);
-
-      // Use Uint8Array to simulate NodeJS's Buffer
-      const buffer = new Uint8Array(bytes);
-
-      window.crypto.getRandomValues(buffer);
-
-      switch(encoding){
-        case 16:
-        case 'hex':
-          return utils.toHex(buffer);
-        case 64:
-        case 'base64':
-          return window.btoa(String.fromCharCode.apply(String, buffer));
-        default:
-          if (!encoding)
-            return buffer;
-          else
-            throw new TypeError('MesseyString.bytes in browser only accept "hex" and "base64" encoding.');
+    utils.createMethods(Messup, {
+      bytes(bytes, encoding){
+        utils.throwIfInvalidLength('byte', bytes);
+  
+        // Use Uint8Array to simulate NodeJS's Buffer
+        const buffer = new Uint8Array(bytes);
+  
+        window.crypto.getRandomValues(buffer);
+  
+        switch(encoding){
+          case 'hex':
+            return utils.toHex(buffer);
+          case 'base64':
+            return window.btoa(String.fromCharCode.apply(String, buffer));
+          default:
+            if (typeof encoding !== 'string')
+              return buffer;
+            else
+              throw new TypeError(`Unsupported encoding: "${encoding}". Messup.bytes in browser currently only accept "hex" and "base64" encoding.`);
+        }
       }
-    }
+    });
 
   }
 
 }
 
 
-export default Object.freeze(Messup);
+export default Messup;
