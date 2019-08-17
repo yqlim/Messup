@@ -28,8 +28,15 @@
   },
   "keywords": [
     "random",
-    "randomstring",
-    "randomnumber"
+    "string",
+    "number",
+    "base64",
+    "base62",
+    "hex",
+    "byte",
+    "bytes",
+    "crypto",
+    "randomBytes"
   ],
   "author": "Yong Quan Lim <yqlim2394@gmail.com>",
   "license": "MIT",
