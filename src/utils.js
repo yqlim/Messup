@@ -20,12 +20,19 @@ export function throwIfNotInteger(){
   });
 }
 
-export function warnIfTooBig(){
-  forEach(arguments, function isTooBig(int){
-    if (int.toString().length > 15){
-      console.warn(`Number ${int} cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
-    }
-  });
+export function warnIfTooBig(justWarn){
+  if (justWarn === true)
+    warn();
+  else
+    forEach(arguments, isTooBig);
+
+  function warn(){
+    console.warn('Numbers with more than 15 digits cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.');
+  }
+  function isTooBig(int){
+    if (int.toString(10).length > 15)
+      warn();
+  }
 }
 
 export function randomFrom(list, resultLength){

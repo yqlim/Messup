@@ -1,4 +1,4 @@
-import * as constants from './constants';
+import * as charCodesFor from './charCodes';
 import * as utils from './utils';
 
 
@@ -7,13 +7,11 @@ const Messup = utils.createMethods({}, {
   number(min = 0, max = 1, hideWarning){
     utils.throwIfNotInteger(min, max);
 
-    if (max < min){
+    if (max < min)
       throw new TypeError('The `max` argument cannot be smaller than the `min` argument.');
-    }
 
-    if (hideWarning !== true){
+    if (hideWarning !== true)
       utils.warnIfTooBig(min, max);
-    }
 
     return utils.inclusiveRangeRandom(min, max);
   },
@@ -21,26 +19,25 @@ const Messup = utils.createMethods({}, {
   numberByLength(length, hideWarning){
     utils.throwIfInvalidLength('character', length);
 
-    if (hideWarning !== true && length > 15){
-      console.warn(`Numbers with more than 15 digits cannot be computed precisely because JavaScript numbers are represented in IEEE-754 binary64 format. Expect incorrect result.`);
-    }
+    if (hideWarning !== true && length > 15)
+      utils.warnIfTooBig(true);
 
     let result;
 
     do {
-      result = utils.randomFrom(constants.NUM, length);
+      result = utils.randomFrom(charCodesFor.NUM, length);
     } while (result[0] === '0');
 
     return parseInt(result, 10);
   },
 
-  string(length, customCharSet){
+  string(length, customChars){
     utils.throwIfInvalidLength('character', length);
 
-    if (typeof customCharSet !== 'string' || customCharSet.length <= 0)
-      customCharSet = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+    if (typeof customChars !== 'string' || customChars.length <= 0)
+      customChars = charCodesFor.ALL;
 
-    return utils.randomFrom(customCharSet, length)
+    return utils.randomFrom(customChars, length)
   },
 
   hex(bytes, useUpperCase){
@@ -61,7 +58,7 @@ const Messup = utils.createMethods({}, {
   base62(length){
     return Messup.string(
       length,
-      constants.NUM.concat(constants.UPC, constants.LWC)
+      charCodesFor.NUM.concat(charCodesFor.UPC, charCodesFor.LWC)
     );
   },
 
