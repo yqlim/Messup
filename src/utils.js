@@ -1,6 +1,9 @@
 export function createMethods(target, obj){
   for (const prop in obj){
-    Object.defineProperty(target, prop, { value: obj[prop] })
+    Object.defineProperty(target, prop, {
+      value: obj[prop],
+      enumerable: true
+    });
   }
   return target;
 }

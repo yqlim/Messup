@@ -51,30 +51,30 @@ describe('Messup', function(){
 
   const thrower = function(){ throw new TypeError('Method is writable/configurable.'); };
 
-  it('methods should not be wriable.', function(){
-    methods.forEach(method => {
-      if (method !== null){
-        Messup[method] = thrower;
-        expect(Messup[method]).to.not.throw(TypeError, 'Method is writable.');
-      }
-    });
-  });
-
-  it('methods should not be enumerable.', function(){
+  it('methods should be enumerable.', function(){
     let i = 0;
     for (const _ in Messup){
       i++;
     }
-    expect(i).to.equal(0);
+    expect(i).to.be.greaterThan(0);
+  });
+
+  it('methods should not be wriable.', function(){
+    for (const method in Messup){
+      if (Messup[method] !== null){
+        Messup[method] = thrower;
+        expect(Messup[method]).to.not.throw(TypeError, 'Method is writable.');
+      }
+    }
   });
 
   it('methods should not be configurable.', function(){
     const runner = function(){
-      methods.forEach(method => {
-        if (method !== null){
+      for (const method in Messup){
+        if (Messup[method] !== null){
           Object.defineProperty(Messup, method, { value: thrower });
         }
-      });
+      }
     };
     expect(runner).to.throw();
   });
