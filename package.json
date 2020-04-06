@@ -1,6 +1,6 @@
 {
   "name": "messup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A random string and number generator, completed with crypto random capabilities.",
   "main": "./lib/index.js",
   "browser": "./lib/index.min.js",
@@ -15,8 +15,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.9.0",
     "chai": "^4.2.0",
-    "mocha": "^6.2.0",
+    "mocha": "^6.2.3",
     "rollup": "^1.19.4",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-node-resolve": "^5.2.0",
