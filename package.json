@@ -2,15 +2,15 @@
   "name": "messup",
   "version": "0.2.2",
   "description": "A random string and number generator, completed with crypto random capabilities.",
-  "main": "./lib/index.js",
-  "browser": "./lib/index.min.js",
+  "main": "./dist/index.js",
+  "browser": "./dist/index.min.js",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
-    "build": "rollup -c && terser -c -m --comments /license/i -o ./lib/index.min.js ./lib/index.js",
+    "build": "rollup -c && terser -c -m --comments /license/i -o ./dist/index.min.js ./dist/index.js",
     "dev": "rollup -c -w",
-    "test": "mocha",
+    "test": "npm run build && mocha",
     "testing": "mocha -w"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "crypto",
     "randomBytes"
   ],
-  "author": "Yong Quan Lim <yqlim2394@gmail.com>",
+  "author": "Yong Quan Lim <23203360+yqlim@users.noreply.github.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/yqlim/Messup/issues"

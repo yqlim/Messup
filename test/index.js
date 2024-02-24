@@ -3,7 +3,7 @@ const expect = chai.expect;
 chai.should();
 
 
-const Messup = require('./../lib');
+const Messup = require('./../dist');
 
 
 const it_should_throw_if_length_is_not_number = function(method, ...args){
@@ -103,13 +103,13 @@ describe('Messup', function(){
       const runner = function(){
         const hist = [];
         const count = (1 - 0) + 1;
-  
+
         while (true){
           const val = Messup.number();
-  
+
           if (!hist.includes(val))
             hist.push(val);
-  
+
           if (hist.length === count)
             return true;
         }
@@ -206,9 +206,9 @@ describe('Messup', function(){
           }
           return ret;
         })(charCodeMin, charCodeMax);
-  
+
         const result = Messup.string((charCodeMax - charCodeMin + 1) * 10);
-  
+
         for (let i = 0; i < result.length; i++)
           if (!defaultSet.includes(result[i]))
             rej(new TypeError(`Character "${result[i]}" is not within the default chatacter set.`));
