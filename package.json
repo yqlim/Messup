@@ -1,6 +1,6 @@
 {
   "name": "messup",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A random string and number generator, completed with crypto random capabilities.",
   "main": "./dist/index.js",
   "browser": "./dist/index.min.js",
